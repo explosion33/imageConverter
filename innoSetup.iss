@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=Image Converter
-AppVersion=0.9.0
+AppVersion=0.9.1
 WizardStyle=modern
 DefaultDirName={autopf}\Image Converter
 Compression=lzma2

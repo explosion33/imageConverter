@@ -41,12 +41,16 @@ void Convert::handleConvert(QStringList files, QString outExt) {
         auto t = file.toLocal8Bit();
         const char* pth = t.data();
         QString ext = getFileExtension(file);
+        qDebug() << ext << outExt;
 
-        t = file.replace(ext, outExt).toLocal8Bit();
+        QString outFile = file;
+        outFile.replace(ext, outExt);
+
+        t = outFile.toLocal8Bit();
         const char* outPth = t.data();
+        ext = ext.toLower();
 
-
-        qDebug() << file << ">>" << outPth;
+        qDebug() << file << ">>" << outFile;
 
 
         //decode image to get rgb data, w, h
@@ -519,20 +523,18 @@ void Convert::squareImage(std::vector<unsigned char> &image, int &w, int &h) {
     if (w < h) {
         image.resize(w*w*4);
         h = w;
+
         return;
     }
     std::vector<unsigned char> square;
 
-    uint byte = 0;
-    for (int y = 0; y < h; y++) {
-        for (int x = 0; x < h; x++) {
-            square.push_back(image[byte]);
-            square.push_back(image[byte+1]);
-            square.push_back(image[byte+2]);
-            square.push_back(image[byte+3]);
-            byte += 4;
-        }
+    uint count = 0;
+    while (count < image.size()) {
+        square.insert(square.end(), image.begin()+count, image.begin()+count+(h*4));
+        count += w*4;
     }
+
+    qDebug() << "w>h" << w << h << image.size() << square.size();
 
     image = square;
     w = h;

@@ -8,6 +8,8 @@
 #include <QRegularExpression>
 #include <QSettings>
 #include <QtConcurrent/QtConcurrentRun>
+#include <QDragEnterEvent>
+#include <QMimeData>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -76,6 +78,10 @@ private:
      * @return File name without path| file.png
      */
     QString sanitizeFileName(QString file);
+
+    void dragEnterEvent(QDragEnterEvent *e);
+    void dropEvent(QDropEvent *e);
+
 
 
 };

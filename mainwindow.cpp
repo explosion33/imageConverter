@@ -47,6 +47,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //set default vals if they dont exist
     if (settings.contains("gui/lastpath"))
         settings.setValue("gui/lastpath", "/");
+
+    setAcceptDrops(true);
 }
 
 MainWindow::~MainWindow()
@@ -79,6 +81,7 @@ void MainWindow::selectFiles() {
 
     //display the chosen file names
     displayFileNames(selectedFiles);
+    ui->progressBar->setValue(0);
 
     //update settings to the last selected folder
     if (selectedFiles.size() > 0) {
@@ -136,7 +139,7 @@ void MainWindow::convertSelectedFiles() {
 
     ui->progressBar->setValue(0);
 
-    QString outType = ui->outputType->itemText(ui->outputType->currentIndex());
+    QString outType = ui->outputType->itemText(ui->outputType->currentIndex()).toLower();
 
 
     emit requestConvert(selectedFiles, outType);
@@ -150,6 +153,30 @@ void MainWindow::getJpegOptions(std::vector<uint> sizes, bool isChecked) {
     connect(&dialog, SIGNAL(userInput(std::vector<uint>)), converter, SLOT(saveJpegSettings(std::vector<uint>)));
 
     dialog.exec();
+
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *e)
+{
+    if (e->mimeData()->hasUrls()) {
+        e->acceptProposedAction();
+    }
+}
+
+void MainWindow::dropEvent(QDropEvent *e)
+{
+    foreach (const QUrl &url, e->mimeData()->urls()) {
+        QString fileName = url.toLocalFile();
+        foreach (const QString ext, converter->acceptedInputs) {
+            qDebug() << sanitizeFileName(fileName) << ext << converter->getFileExtension(fileName).toLower();
+            if (ext == converter->getFileExtension(fileName).toLower()) {
+                qDebug() << "match";
+                selectedFiles.append(fileName);
+            }
+        }
+    }
+    displayFileNames(selectedFiles);
+    ui->progressBar->setValue(0);
 
 }
 
